@@ -1,0 +1,13 @@
+.progress {
+    position: fixed;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.ant-progress-bg {
+    position: fixed;
+    left: 0;
+    top: 0;
+}

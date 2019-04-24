@@ -29,7 +29,7 @@ export default class Sqlite3 {
         let placeholders = keys.map(() => '?').join(',')
         let sql = `INSERT INTO ${tableName}(${keyString}) VALUES(${placeholders})`
 
-        this.db.run(sql, values, (err) => this._handleErr(err, onError, onSuccess))
+        this.db.run(sql, values, (err) => this._handleErr(err, onError, onSuccess, this.lastID))
     }
 
     insertMutil = (tableName, keys, values, onError, onSuccess) => {
@@ -64,8 +64,8 @@ export default class Sqlite3 {
         this.db.each(sql, params || [], (err, row) => this._handleErr(err, onError, onSuccess, row))
     }
 
-    run = (sql, params) => {
-
+    run = (sql, params, onError, onSuccess) => {
+        this.db.run(sql, [], err => this._handleErr(err, onError, onSuccess))
     }
 
     close = () => {

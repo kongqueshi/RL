@@ -1,7 +1,8 @@
 {
   "PATH": "db.db",
   "CREATE_TABLE_SQLS": [
-    "CREATE TABLE images (name TEXT, path TEXT, hash TEXT, isDelete INTEGER)",
-    "CREATE TABLE tags (name TEXT)"
-  ]
+    "CREATE TABLE IF NOT EXISTS images(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, path TEXT, hash TEXT UNIQUE, tagIds TEXT, isDelete INTEGER DEFAULT 0)",
+    "CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
+  ],
+  "CREATE_INDEX_SQLS": ["CREATE UNIQUE INDEX idx_images_hash ON images (hash)"]
 }

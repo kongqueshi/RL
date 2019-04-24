@@ -51,4 +51,6 @@ main.js.map
 npm-debug.log.*
 
 *.db
+db.db-journal
+config.json
 
