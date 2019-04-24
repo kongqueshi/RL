@@ -4,13 +4,7 @@
 
 import path from 'path'
 import webpack from 'webpack'
-import ExtractTextPlugin from "extract-text-webpack-plugin"
 import { dependencies } from '../package.json'
-
-// const extractLess = new ExtractTextPlugin({
-//     filename: "[name].[md5:contenthash:hex:20].css",
-//     disable: true
-// })
 
 export default {
   externals: [...Object.keys(dependencies || {})],
