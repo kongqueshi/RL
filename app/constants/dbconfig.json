@@ -1,0 +1,6 @@
+{
+    "PATH": "db.db",
+    "CREATE_TABLE_SQLS": [
+        "CREATE TABLE images (name TEXT, path TEXT, hash TEXT, isDelete INTEGER)"
+    ] 
+}
