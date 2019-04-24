@@ -9,12 +9,14 @@ export default class MenuBuilder {
   }
 
   buildMenu() {
-    if (
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-    ) {
-      this.setupDevelopmentEnvironment();
-    }
+    // if (
+    //   process.env.NODE_ENV === 'development' ||
+    //   process.env.DEBUG_PROD === 'true'
+    // ) {
+    //   this.setupDevelopmentEnvironment();
+    // }
+
+    this.setupDevelopmentEnvironment();
 
     const template =
       process.platform === 'darwin'

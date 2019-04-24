@@ -1,10 +1,12 @@
 // @flow
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import routes from '../constants/routes';
-import styles from './Home.css';
-import fs from 'fs';
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import routes from '../constants/routes'
+import styles from './Home.css'
+import fs from 'fs'
 import Sqlite3 from '../utils/sqlite3'
+import Tag from '../components/tag/tag'
+
 
 type Props = {}
 
@@ -24,7 +26,7 @@ export default class HomePage extends Component<Props> {
 
     return (
       <div className={styles.container} data-tid="container">
-        <h2>Home</h2>
+        <Tag/>
         <Link to={routes.COUNTER}>to Counter</Link>
       </div>
     );

@@ -2,9 +2,15 @@
  * Base webpack config used across other specific configs
  */
 
-import path from 'path';
-import webpack from 'webpack';
-import { dependencies } from '../package.json';
+import path from 'path'
+import webpack from 'webpack'
+import ExtractTextPlugin from "extract-text-webpack-plugin"
+import { dependencies } from '../package.json'
+
+// const extractLess = new ExtractTextPlugin({
+//     filename: "[name].[md5:contenthash:hex:20].css",
+//     disable: true
+// })
 
 export default {
   externals: [...Object.keys(dependencies || {})],
@@ -20,7 +26,17 @@ export default {
             cacheDirectory: true
           }
         }
-      }
+      },
+      // {
+      //   test: /\.less$/,
+      //   use: [{
+      //     loader: "style-loader" // creates style nodes from JS strings
+      //   }, {
+      //       loader: "css-loader" // translates CSS into CommonJS
+      //   }, {
+      //       loader: "less-loader" // compiles Less to CSS
+      //   }]
+      // }
     ]
   },
 
@@ -42,6 +58,7 @@ export default {
       NODE_ENV: 'production'
     }),
 
-    new webpack.NamedModulesPlugin()
+    new webpack.NamedModulesPlugin(),
+    // extractLess
   ]
 };

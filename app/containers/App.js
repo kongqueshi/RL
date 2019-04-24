@@ -5,7 +5,7 @@ import Sqlite3 from '../utils/sqlite3'
 
 type Props = {
   children: React.Node
-};
+}
 
 export default class App extends React.Component<Props> {
   constructor(props) {
@@ -21,7 +21,7 @@ export default class App extends React.Component<Props> {
   }
 
   render() {
-    const { children } = this.props;
-    return <React.Fragment>{children}</React.Fragment>;
+    const { children } = this.props
+    return <React.Fragment>{children}</React.Fragment>
   }
 }
