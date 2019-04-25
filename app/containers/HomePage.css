@@ -37,7 +37,7 @@
 }
 
 .App > .control > .next > i {
-  border-radius: 10px 0 0 10px!important;
+  border-radius: 10px 0 0 10px !important;
 }
 
 .App > .control > div > i {
@@ -47,6 +47,7 @@
   width: 30px;
   padding-top: 65px;
   border-radius: 0 10px 10px 0;
+
   /* opacity: 0; */
 }
 

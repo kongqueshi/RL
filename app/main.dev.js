@@ -67,13 +67,13 @@ app.on('ready', async () => {
     await installExtensions();
   }
 
-  await installExtensions();
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728
   });
+
+  mainWindow.setAutoHideMenuBar(true)
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 

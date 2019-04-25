@@ -82,11 +82,11 @@ export default class HomePage extends Component {
 
     fs.readdir(BASE_PATH, null, (err, files) => {
       this.files = files.filter(file => file.indexOf('.')  !== 0)
-      this.files.forEach(file => {
-        hash(BASE_PATH + file).then(
-          (hash) => this.db.insertSingle('images', ['name', 'path', 'hash'], [file, BASE_PATH, hash], (err) => { console.error(err.message, file) }, (id) => console.log(id))
-        ).catch(error => { console.error(error) })
-      })
+      // this.files.forEach(file => {
+      //   hash(BASE_PATH + file).then(
+      //     (hash) => this.db.insertSingle('images', ['name', 'path', 'hash'], [file, BASE_PATH, hash], (err) => { console.error(err.message, file) }, (id) => console.log(id))
+      //   ).catch(error => { console.error(error) })
+      // })
       this.timer = setInterval(this.nextImage, this.playSpeed)
     })
 
