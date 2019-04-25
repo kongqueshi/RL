@@ -7,7 +7,9 @@ import fs from 'fs'
 import Crawer from '../plugins/crowers/crawer'
 import Sqlite3 from '../utils/sqlite3'
 import { hash } from '../utils/hash'
+import filteFile from '../utils/filefilter'
 import dbconfig from '../constants/dbconfig'
+import filetypies from '../constants/filetypies'
 import './HomePage.css'
 
 const localElectron = require('electron')
@@ -15,7 +17,7 @@ const localElectron = require('electron')
 const electron = localElectron.remote.require('electron')
 const { Menu, BrowserWindow } = electron
 
-const BASE_PATH = 'f:/huaban/'
+const BASE_PATH = '/Users/kongqueshi/Downloads/'
 
 export default class HomePage extends Component {
   constructor() {
@@ -80,15 +82,34 @@ export default class HomePage extends Component {
       this.setState({showControl: true})
     })
 
-    fs.readdir(BASE_PATH, null, (err, files) => {
-      this.files = files.filter(file => file.indexOf('.')  !== 0)
-      this.files.forEach(file => {
-        hash(BASE_PATH + file).then(
-          (hash) => this.db.insertSingle('images', ['name', 'path', 'hash'], [file, BASE_PATH, hash], (err) => { console.error(err.message, file) }, (id) => console.log(id))
-        ).catch(error => { console.error(error) })
-      })
-      this.timer = setInterval(this.nextImage, this.playSpeed)
+    filteFile(BASE_PATH, filetypies.TYPIES.IMAGE, (err, files) => {
+      if(err) {
+        console.error(err)
+      } else {
+        this.files = files
+        this.timer = setInterval(this.nextImage, this.playSpeed)
+      }
     })
+
+    // fs.readdir(BASE_PATH, null, (err, files) => {
+    //   this.files = files.filter(file => {
+    //     if (file.indexOf('.') <= 0) {
+    //       return false
+    //     } else {
+    //       if ( file.substring(0, file.lastIndexOf('.')).toLowerCase in ['jpg', 'jpeg', 'gif']) {
+    //         return true
+    //       }
+
+    //       return false
+    //     }
+    //   })
+    //   this.files.forEach(file => {
+    //     hash(BASE_PATH + file).then(
+    //       (hash) => this.db.insertSingle('images', ['name', 'path', 'hash'], [file, BASE_PATH, hash], (err) => { console.error(err.message, file) }, (id) => console.log(id))
+    //     ).catch(error => { console.error(error) })
+    //   })
+    //   
+    // })
 
     const template = [
       {
