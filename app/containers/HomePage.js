@@ -7,7 +7,10 @@ import fs from 'fs'
 import Crawer from '../plugins/crowers/crawer'
 import Sqlite3 from '../utils/sqlite3'
 import { hash } from '../utils/hash'
+import filteFile from '../utils/filefilter'
 import dbconfig from '../constants/dbconfig'
+import filetypies from '../constants/filetypies'
+import Tag from '../components/tag/tag'
 import './HomePage.css'
 
 const localElectron = require('electron')
@@ -15,14 +18,15 @@ const localElectron = require('electron')
 const electron = localElectron.remote.require('electron')
 const { Menu, BrowserWindow } = electron
 
-const BASE_PATH = 'f:/huaban/'
+const BASE_PATH = '/Users/kongqueshi/Downloads/'
 
 export default class HomePage extends Component {
   constructor() {
     super()
     this.state = {
       path: '20170815b07.jpg',
-      showControl: false
+      showControl: false,
+      tagIds: []
     }
 
     const [ browserWindow ] = BrowserWindow.getAllWindows()
@@ -59,8 +63,7 @@ export default class HomePage extends Component {
 
       fs.writeFile('./config.json', JSON.stringify(config), 'utf8', (e) => {
         if(e) {
-          console.log(e)
-          throw(e)
+          console.error(e)
         } else {
           this.configSaved = true
           this.browserWindow.destroy()
@@ -69,7 +72,6 @@ export default class HomePage extends Component {
 
       return false
     }
-    
 
     this.db = new Sqlite3(dbconfig.PATH)
   }
@@ -80,15 +82,34 @@ export default class HomePage extends Component {
       this.setState({showControl: true})
     })
 
-    fs.readdir(BASE_PATH, null, (err, files) => {
-      this.files = files.filter(file => file.indexOf('.')  !== 0)
-      // this.files.forEach(file => {
-      //   hash(BASE_PATH + file).then(
-      //     (hash) => this.db.insertSingle('images', ['name', 'path', 'hash'], [file, BASE_PATH, hash], (err) => { console.error(err.message, file) }, (id) => console.log(id))
-      //   ).catch(error => { console.error(error) })
-      // })
-      this.timer = setInterval(this.nextImage, this.playSpeed)
+    filteFile(BASE_PATH, filetypies.TYPIES.IMAGE, (err, files) => {
+      if(err) {
+        console.error(err)
+      } else {
+        this.files = files
+        this.timer = setInterval(this.nextImage, this.playSpeed)
+      }
     })
+
+    // fs.readdir(BASE_PATH, null, (err, files) => {
+    //   this.files = files.filter(file => {
+    //     if (file.indexOf('.') <= 0) {
+    //       return false
+    //     } else {
+    //       if ( file.substring(0, file.lastIndexOf('.')).toLowerCase in ['jpg', 'jpeg', 'gif']) {
+    //         return true
+    //       }
+
+    //       return false
+    //     }
+    //   })
+    //   this.files.forEach(file => {
+    //     hash(BASE_PATH + file).then(
+    //       (hash) => this.db.insertSingle('images', ['name', 'path', 'hash'], [file, BASE_PATH, hash], (err) => { console.error(err.message, file) }, (id) => console.log(id))
+    //     ).catch(error => { console.error(error) })
+    //   })
+    //   
+    // })
 
     const template = [
       {
@@ -166,11 +187,13 @@ export default class HomePage extends Component {
       if (!this.files[nextIndex]) {
         this.nextImage(true)
         return
-      } 
+      }
 
-      this.setState({
-        path: this.files[nextIndex]
-      })
+      this.updateImageState(this.files[nextIndex])
+
+      // this.setState({
+      //   path: this.files[nextIndex]
+      // })
     } 
   }
 
@@ -218,8 +241,17 @@ export default class HomePage extends Component {
     })
   }
 
+  updateImageState = (name) => {
+    this.db.queryFirst(`select * from images where name='${name}'`, [], null, (row) => {
+      this.setState({
+        path: name,
+        tagIds: row.tagIds || []
+      })
+    })
+  }
+
   render() {
-    const { path, pause, showControl, crawerModalVisible, crawerType } = this.state
+    const { path, pause, showControl, crawerModalVisible, crawerType, tagIds } = this.state
 
     return (
       <div className="App" ref={(app) => {this.app = app}}>
@@ -241,9 +273,11 @@ export default class HomePage extends Component {
 
         {path && <img alt="" src={`file://${BASE_PATH}${path}`}/>}
 
+        <Tag selectedTagIds={tagIds} onChange={value => console.log(`selected ${value}`)}/>
+
         {crawerModalVisible && <Crawer type={crawerType} pathToSave={BASE_PATH} close={() => this.setState({crawerModalVisible: false})} 
           onFinish={(sucessCount, failCount) => this.showNotification('爬取完成', `成功 ${sucessCount}，失败 ${failCount}`)}/>}
       </div>
-    );
+    )
   }
 }

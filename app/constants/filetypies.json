@@ -1,0 +1,7 @@
+{
+    "TYPIES": {
+        "IMAGE": "IMAGE",
+        "VIDEO": "VIDEO"
+    },
+    "IMAGE": ["jpeg", "jpg", "png", "gif"]
+}
