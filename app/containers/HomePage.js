@@ -10,6 +10,7 @@ import { hash } from '../utils/hash'
 import filteFile from '../utils/filefilter'
 import dbconfig from '../constants/dbconfig'
 import filetypies from '../constants/filetypies'
+import Tag from '../components/tag/tag'
 import './HomePage.css'
 
 const localElectron = require('electron')
@@ -61,8 +62,7 @@ export default class HomePage extends Component {
 
       fs.writeFile('./config.json', JSON.stringify(config), 'utf8', (e) => {
         if(e) {
-          console.log(e)
-          throw(e)
+          console.error(e)
         } else {
           this.configSaved = true
           this.browserWindow.destroy()
@@ -71,7 +71,6 @@ export default class HomePage extends Component {
 
       return false
     }
-    
 
     this.db = new Sqlite3(dbconfig.PATH)
   }
@@ -187,11 +186,13 @@ export default class HomePage extends Component {
       if (!this.files[nextIndex]) {
         this.nextImage(true)
         return
-      } 
+      }
 
-      this.setState({
-        path: this.files[nextIndex]
-      })
+      this.updateImageState(this.files[nextIndex])
+
+      // this.setState({
+      //   path: this.files[nextIndex]
+      // })
     } 
   }
 
@@ -239,6 +240,15 @@ export default class HomePage extends Component {
     })
   }
 
+  updateImageState = (name) => {
+    this.db.queryFirst(`select * from images where name='${name}'`, [], null, (row) => {
+      this.setState({
+        path: name,
+        tagIds: row.tagIds
+      })
+    })
+  }
+
   render() {
     const { path, pause, showControl, crawerModalVisible, crawerType } = this.state
 
@@ -262,9 +272,11 @@ export default class HomePage extends Component {
 
         {path && <img alt="" src={`file://${BASE_PATH}${path}`}/>}
 
+        <Tag onChange={value => console.log(`selected ${value}`)}/>
+
         {crawerModalVisible && <Crawer type={crawerType} pathToSave={BASE_PATH} close={() => this.setState({crawerModalVisible: false})} 
           onFinish={(sucessCount, failCount) => this.showNotification('爬取完成', `成功 ${sucessCount}，失败 ${failCount}`)}/>}
       </div>
-    );
+    )
   }
 }
