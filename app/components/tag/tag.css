@@ -1,5 +1,25 @@
 .tag {
-    
+    width: 300px;
+    background: black;
+    color: #fff;
+    padding: 5px;
+}
+
+.tag .search-new-input {
+    width: 100%;
+}
+
+.tag .tag-div {
+    text-align: left;
+    margin-top: 10px;
+}
+
+.tag .tag-div > p {
+    text-align: left;
+}
+
+.tag .tag-div .tag-content > div {
+    margin-bottom: 3px;
 }
 
 .selected {

@@ -28,8 +28,8 @@ export default class Sqlite3 {
         let keyString = keys.map((key) => key).join(',')
         let placeholders = keys.map(() => '?').join(',')
         let sql = `INSERT INTO ${tableName}(${keyString}) VALUES(${placeholders})`
-
-        this.db.run(sql, values, (err) => this._handleErr(err, onError, onSuccess, this.lastID))
+        const _this = this
+        this.db.run(sql, values, function(error) { _this._handleErr(err, onError, onSuccess, this.lastID) })
     }
 
     insertMutil = (tableName, keys, values, onError, onSuccess) => {

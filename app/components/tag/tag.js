@@ -14,6 +14,7 @@ export default class Tag extends Component {
     super(props)
     this.state = {
         allTags: {},
+        allTagNames: {},
         selectedTags: [],
         unSelectedTags: []
     }
@@ -30,26 +31,14 @@ export default class Tag extends Component {
             this.setState({
               allTags,
               allTagNames
-            })
+            }, () => this.buildTags(props.selectedTagIds))
         })
     })
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedTagIds !== this.props.selectedTagIds) {
-      const copiedAllTags = {...this.state.allTags}
-      const selectedTags = []
-      nextProps.selectedTagIds.forEach(id => {
-        selectedTags.push(copiedAllTags[id])
-        copiedAllTags.id = null
-      })
-
-      const unSelectedTags = Object.values(copiedAllTags)
-
-      this.setState({
-        selectedTags,
-        unSelectedTags
-      })
+      this.buildTags(nextProps.selectedTagIds)
     }
   }
 
@@ -59,9 +48,35 @@ export default class Tag extends Component {
     }
   }
 
-  onSelect = (value) => {
+  buildTags = (selectedTagIds) => {
+    const copiedAllTags = Object.assign(this.state.allTags)
+    const selectedTags = []
+    selectedTagIds.forEach(id => {
+      selectedTags.push(copiedAllTags[id])
+      copiedAllTags.id = null
+    })
+
+    const unSelectedTags = Object.values(copiedAllTags)
+
     this.setState({
-      selectedValue: value
+      selectedTags,
+      unSelectedTags
+    })
+  }
+
+  onSelect = (value) => {
+    const { allTagNames, selectedTags } = this.state
+    const selectedTag = allTagNames[value]
+
+    let hasSelected = false
+    selectedTags.forEach(tag => {if (tag.id === selectedTag.id) hasSelected = true;})
+
+    if (!hasSelected) {
+      this.selectTag(selectedTag)
+    }
+
+    this.setState({
+      selectedValue: null
     })
   }
 
@@ -69,17 +84,19 @@ export default class Tag extends Component {
     if (e.key === 'Enter' && this.searchValue) {
       const { allTagNames, selectedTags, allTags } = this.state
       if (!allTagNames[this.searchValue]) {
-        this.db.run(`insert into tags(name) values('${this.searchValue}')`)
-        const newTag = {name:this.searchValue, id:1}
-        selectedTags.push(newTag)
-        allTags[newTag.id] = newTag
-        allTagNames[this.searchValue] = newTag
-
-        this.setState({
-          selectedTags,
-          allTagNames,
-          allTags,
-          selectedValue: null
+        this.db.insertSingle('tags', ['name'], [this.searchValue], undefined, (id) => {
+          console.log(id)
+          const newTag = {name:this.searchValue, id:id}
+          selectedTags.push(newTag)
+          allTags[newTag.id] = newTag
+          allTagNames[this.searchValue] = newTag
+  
+          this.setState({
+            selectedTags,
+            allTagNames,
+            allTags,
+            selectedValue: null
+          })
         })
       }
       
@@ -91,11 +108,42 @@ export default class Tag extends Component {
     this.searchValue = value
   }
 
-  renderTags = (tags) => {
+  handleTagClick = (tagId) => {
+    const { allTags } = this.state
+    this.selectTag(allTags[tagId])
+  }
+
+  selectTag = (tag) => {
+    const { selectedTags, unSelectedTags } = this.state
+
+    selectedTags.push(tag)
+    
+    let unSelectedTag
+    for(let i = 0;i < unSelectedTags.length; i++) {
+      unSelectedTag = unSelectedTags[i]
+      if (unSelectedTag.id === tag.id) {
+        unSelectedTags.splice(i, 1)
+        break
+      }
+    }
+
+    this.setState({
+      selectedTags,
+      unSelectedTags
+    })
+  }
+
+  renderTags = (tags, isSelected) => {
     const tagEles = []
-
-    tags.forEach(tag => tagEles.push(<AntdTag key={tag.name}>{tag.name}</AntdTag>))
-
+    const antdTag = 
+    tags.forEach(tag => tagEles.push(
+      <AntdTag
+        key={tag.id}
+        color={isSelected ? "#108ee9" : undefined}
+        onClick={() => {!isSelected && this.handleTagClick(tag.id)}}
+      >
+          {tag.name}
+      </AntdTag>))
     return tagEles
   }
 
@@ -103,10 +151,10 @@ export default class Tag extends Component {
     const { allTagNames, selectedValue, selectedTags, unSelectedTags } = this.state
 
     return (
-      <div className={styles.tag}>
+      <div className='tag'>
         <AutoComplete
+            className='search-new-input'
             dataSource={Object.keys(allTagNames || {})}
-            style={{ width: 200 }}
             onChange={(value) => this.setState({selectedValue: value})}
             onSelect={this.onSelect}
             onSearch={this.handleSearch}
@@ -115,11 +163,17 @@ export default class Tag extends Component {
           >
             <Input onKeyDown={(e) => this.handleKeyDown(e)} />
           </AutoComplete>
-        <div className="selected">
-          {this.renderTags(selectedTags)}
+        <div className="tag-div selected">
+          <p>已选择标签</p>
+          <div className='tag-content'>
+            {this.renderTags(selectedTags, true)}
+          </div>
         </div>
-        <div className="un-selected">
-          {this.renderTags(unSelectedTags)}
+        <div className="tag-div un-selected">
+          <p>未选择标签</p>
+          <div className='tag-content'>
+            {this.renderTags(unSelectedTags)}
+          </div>
         </div>
       </div>
     );

@@ -87,7 +87,7 @@ export default class HomePage extends Component {
         console.error(err)
       } else {
         this.files = files
-        this.timer = setInterval(this.nextImage, this.playSpeed)
+        // this.timer = setInterval(this.nextImage, this.playSpeed)
       }
     })
 
