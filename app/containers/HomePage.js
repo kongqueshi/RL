@@ -56,7 +56,7 @@ export default class HomePage extends Component {
     this.history = []
     this.historyIndex = 0
 
-    browserWindow.webContents.openDevTools()
+    // browserWindow.webContents.openDevTools()
 
     window.onbeforeunload = () => {
       if (this.configSaved) {
@@ -143,7 +143,7 @@ export default class HomePage extends Component {
 
   resetControlTimer = () => {
     clearTimeout(this.hideControlTimer)
-    this.hideControlTimer = setTimeout(() => this.setState({showControl: false}), 1000)
+    this.hideControlTimer = setTimeout(() => this.setState({showControl: false}), 3000)
   }
 
   resetTimer = (playSpeed) => {

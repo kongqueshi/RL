@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-plusplus */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -9,7 +10,7 @@ import { AutoComplete, Tag as AntdTag } from 'antd'
 import dbconfig from '../../constants/dbconfig'
 import Sqlite3 from '../../utils/sqlite3'
 import './tag.css'
-import getHomePath from '../../utils/home';
+import getHomePath from '../../utils/home'
 
 
 export default class Tag extends Component {
@@ -65,6 +66,7 @@ export default class Tag extends Component {
     })
 
     const unSelectedTags = Object.values(copiedAllTags).filter(tag => !!tag)
+    unSelectedTags.sort((a, b) => a.count < b.count ? 1 : -1)
 
     this.setState({
       selectedTags,
@@ -167,7 +169,10 @@ export default class Tag extends Component {
       }
     }
 
-    this.db.update(`update tags set count= count ${flag ? '-' : '+'} 1 where name='${tag.name}'`)
+    tag.count += flag ? -1 : 1
+    this.db.update(`update tags set count=${tag.count} where name='${tag.name}'`)
+
+    unSelectedTags.sort((a, b) => a.count < b.count ? 1 : -1)
 
     this.setState({
       selectedTags,
