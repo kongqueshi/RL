@@ -1,3 +1,5 @@
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 // @flow
@@ -12,29 +14,35 @@ import dbconfig from '../constants/dbconfig'
 import filetypies from '../constants/filetypies'
 import Tag from '../components/tag/tag'
 import './HomePage.css'
+import getHomePath from '../utils/home'
 
 const localElectron = require('electron')
 
 const electron = localElectron.remote.require('electron')
 const { Menu, BrowserWindow } = electron
 
-const BASE_PATH = '/Users/kongqueshi/Downloads/'
+const BASE_PATH = 'f:/huaban/'
 
 export default class HomePage extends Component {
   constructor() {
     super()
     this.state = {
       path: '20170815b07.jpg',
+      imageWidth: '100%',
+      imageHeight: 'auto',
       showControl: false,
-      tagIds: []
+      tagIds: [],
+      tagPanelWidth: 20,
+      tagPanelOpacity: 0
     }
 
+    const homePath = getHomePath()
     const [ browserWindow ] = BrowserWindow.getAllWindows()
     this.browserWindow = browserWindow
 
     let config = {}
     try {
-      const configString = fs.readFileSync('./config.json', 'utf-8')
+      const configString = fs.readFileSync(`${homePath}config.json`, 'utf-8')
       config = JSON.parse(configString) || {}
     } catch { console.log("") }
     
@@ -47,6 +55,8 @@ export default class HomePage extends Component {
     
     this.history = []
     this.historyIndex = 0
+
+    browserWindow.webContents.openDevTools()
 
     window.onbeforeunload = () => {
       if (this.configSaved) {
@@ -61,7 +71,7 @@ export default class HomePage extends Component {
         opacity: this.opacity
       }
 
-      fs.writeFile('./config.json', JSON.stringify(config), 'utf8', (e) => {
+      fs.writeFile(`${homePath}config.json`, JSON.stringify(config), 'utf8', (e) => {
         if(e) {
           console.error(e)
         } else {
@@ -73,7 +83,7 @@ export default class HomePage extends Component {
       return false
     }
 
-    this.db = new Sqlite3(dbconfig.PATH)
+    this.db = new Sqlite3(`${homePath}${dbconfig.NAME}`)
   }
 
   componentDidMount() {
@@ -82,34 +92,16 @@ export default class HomePage extends Component {
       this.setState({showControl: true})
     })
 
+    // this.image.addEventListener('dblclick', () => console.log('sdsdd'))
+
     filteFile(BASE_PATH, filetypies.TYPIES.IMAGE, (err, files) => {
       if(err) {
         console.error(err)
       } else {
         this.files = files
-        // this.timer = setInterval(this.nextImage, this.playSpeed)
+        this.timer = setInterval(this.nextImage, this.playSpeed)
       }
     })
-
-    // fs.readdir(BASE_PATH, null, (err, files) => {
-    //   this.files = files.filter(file => {
-    //     if (file.indexOf('.') <= 0) {
-    //       return false
-    //     } else {
-    //       if ( file.substring(0, file.lastIndexOf('.')).toLowerCase in ['jpg', 'jpeg', 'gif']) {
-    //         return true
-    //       }
-
-    //       return false
-    //     }
-    //   })
-    //   this.files.forEach(file => {
-    //     hash(BASE_PATH + file).then(
-    //       (hash) => this.db.insertSingle('images', ['name', 'path', 'hash'], [file, BASE_PATH, hash], (err) => { console.error(err.message, file) }, (id) => console.log(id))
-    //     ).catch(error => { console.error(error) })
-    //   })
-    //   
-    // })
 
     const template = [
       {
@@ -120,7 +112,7 @@ export default class HomePage extends Component {
           { label: '加快播放', click: () => this.changePlaySpeed(-200), accelerator: 'Up'},
           { label: '减速播放', click: () => this.changePlaySpeed(200), accelerator: 'Down'},
           { label: '下一个', click: () => this.nextImage(true), accelerator: 'Right'},
-          { label: '上一个', click: () => this.preImage(), accelerator: 'Left'},
+          { label: '上一个', click: () => this.preImage(true), accelerator: 'Left'},
           { label: '暂停/开始 播放', click: () => { this.pause = !this.pause }, accelerator: 'Space' },
           { label: '删除', click: () => this.delete(), accelerator: 'Delete' },
           { label: '全屏', click: () => this.browserWindow.setFullScreen(true), accelerator: 'Enter' },
@@ -162,10 +154,10 @@ export default class HomePage extends Component {
   }
 
   nextImage = (force) => {
+    if (!force && this.state.tagPanelVisible) return
+
     const { length } = this.files
     if (this.files && length && (!this.pause || force)) {
-      if (force) this.resetTimer()
-
       let nextIndex
 
       if (this.history.length > 0 && this.historyIndex < this.history.length) {
@@ -189,15 +181,13 @@ export default class HomePage extends Component {
         return
       }
 
-      this.updateImageState(this.files[nextIndex])
-
-      // this.setState({
-      //   path: this.files[nextIndex]
-      // })
+      this.updateImageState(this.files[nextIndex], force)
     } 
   }
 
-  preImage = () => {
+  preImage = (force) => {
+    if (!force && this.state.tagPanelVisible) return
+
     let historyIndex = this.historyIndex - 1
     if(historyIndex > this.history.length - 1) historyIndex = this.history.length - 2
 
@@ -209,9 +199,7 @@ export default class HomePage extends Component {
       if (!this.files[this.index]) {
         this.preImage()
       } else {
-        this.setState({
-          path: this.files[this.index]
-        })
+        this.updateImageState(this.files[this.index])
       }
     }
   }
@@ -241,39 +229,104 @@ export default class HomePage extends Component {
     })
   }
 
-  updateImageState = (name) => {
+  setTagPanelVisible = (visible) => {
+    this.setState({
+      tagPanelWidth: visible ? 200 : 20,
+      tagPanelOpacity: visible ? 1 : 0,
+      tagPanelVisible: visible
+    })
+  }
+
+  onTagChange = (selectedTags) => {
+    if (selectedTags) {
+      const { path } = this.state
+      const tagIds = selectedTags.map(tag => tag.id).join(',')
+      this.db.update(`UPDATE images SET tagIds='${tagIds}' WHERE name='${path}'`)
+    }
+  }
+
+  updateImageState = (name, force) => {
     this.db.queryFirst(`select * from images where name='${name}'`, [], null, (row) => {
-      this.setState({
-        path: name,
-        tagIds: row.tagIds || []
-      })
+      let tagIds
+
+      if (row) {
+          tagIds = row.tagIds ? row.tagIds.split(',').map(tag => Number(tag)) : []
+      } else {
+        hash(BASE_PATH + name).then(
+          (value) =>  this.db.insertSingle('images', ['name', 'hash', 'path'], [name, value, BASE_PATH])
+        ).catch(reason => console.error(reason))
+
+        tagIds = []
+      }
+
+      const img = new Image()
+
+      img.onload = () => {
+        const { app } = this
+        const { width, height} = img
+        const { clientWidth, clientHeight} = app
+
+        if ( parseFloat(width) / clientWidth < parseFloat(height) / clientHeight) {
+          this.setState({
+            imageWidth: 'auto',
+            imageHeight: '100%'
+          })
+        } else {
+          this.setState({
+            imageWidth: '100%',
+            imageHeight: 'auto'
+          })
+        }
+
+        this.setState({
+          path: name,
+          tagIds
+        })
+
+        if (force) { this.resetTimer() }
+      }
+
+      img.src = `file://${BASE_PATH}${name}`
     })
   }
 
   render() {
-    const { path, pause, showControl, crawerModalVisible, crawerType, tagIds } = this.state
+    const { path, pause, showControl, crawerModalVisible, crawerType, tagIds, tagPanelWidth, tagPanelOpacity, imageWidth, imageHeight } = this.state
+
+    const imageUrl = `file://${BASE_PATH}${path}`
 
     return (
-      <div className="App" ref={(app) => {this.app = app}}>
+      <div style={{backgroundImage: `url(${imageUrl})`}} className="App" ref={(app) => {this.app = app}}>
         {showControl && 
           <div className='control'>
-            <div className='pre' onClick={() => {this.preImage();this.resetControlTimer()}}>
-              <Icon type="double-left"/>
-            </div>
-            
-            <div className='next' onClick={() => {this.nextImage();this.resetControlTimer()}}>
-              <Icon type="double-right"/>
-            </div>
+            <div className='pre' onClick={() => {this.preImage(true);this.resetControlTimer()}}>
+                <Icon type="double-left"/>
+              </div>
+              
+              <div className='play-switch' onClick={() => {this.pause = !this.pause; this.setState({pause: this.pause});this.resetControlTimer()}}>
+                <Icon type={pause ? 'play-circle' : "pause-circle"} />
+              </div>
 
-            <div className='play-switch' onClick={() => {this.pause = !this.pause; this.setState({pause: this.pause});this.resetControlTimer()}}>
-              <Icon type={pause ? 'play-circle' : "pause-circle"} />
-            </div>
+              <div className='next' onClick={() => {this.nextImage(true);this.resetControlTimer()}}>
+                <Icon type="double-right"/>
+              </div>
           </div>
         }
 
-        {path && <img alt="" src={`file://${BASE_PATH}${path}`}/>}
+        {path && <img ref={(image) => {this.image = image}} 
+                    style={{width: imageWidth, height: imageHeight}} 
+                    alt="" src={imageUrl}
+                    onDoubleClick={() => this.nextImage(true)}
+                  />
+        }
 
-        <Tag selectedTagIds={tagIds} onChange={value => console.log(`selected ${value}`)}/>
+        <Tag 
+          style={{width: tagPanelWidth, opacity: tagPanelOpacity}}
+          selectedTagIds={tagIds}
+          onChange={(selectedTags) => this.onTagChange(selectedTags)} 
+          onMouseOver={() => this.setTagPanelVisible(true)} 
+          onMouseOut={() => this.setTagPanelVisible(false)}
+        />
 
         {crawerModalVisible && <Crawer type={crawerType} pathToSave={BASE_PATH} close={() => this.setState({crawerModalVisible: false})} 
           onFinish={(sucessCount, failCount) => this.showNotification('爬取完成', `成功 ${sucessCount}，失败 ${failCount}`)}/>}

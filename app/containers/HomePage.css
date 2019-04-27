@@ -11,59 +11,57 @@
   margin: auto;
 }
 
+.App > .tag {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  /* transition: 200ms; */
+  overflow-x: hidden;
+}
+
 .App > .control {
   position: absolute;
+  background: rgba(255, 255, 255, 0.5);
   width: 100%;
-  height: 100%;
+  height: 60px;
+  bottom: 20px;
 }
 
 .App > .control > div {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  height: 100%;
+  display: inline-block;
+  height: 40px;
+  margin: 10px 40px;
 }
 
-/* .App > .control > div > i:hover {
-  opacity: 1;
-} */
-
-.App > .control > .left {
+/* .App > .control > .left {
   float: left;
 }
 
 .App > .control > .next {
   right: 0;
-}
+} */
 
 .App > .control > .next > i {
   border-radius: 10px 0 0 10px !important;
 }
 
 .App > .control > div > i {
-  background: rgba(255,255,255,0.5);
   margin: auto;
-  height: 150px;
-  width: 30px;
-  padding-top: 65px;
-  border-radius: 0 10px 10px 0;
-
-  /* opacity: 0; */
+  width: 40px;
+  font-size: 40px;
 }
-
+/* 
 .App > .control > .play-switch {
-  height: auto;
-  bottom: 20px;
-  width: 100%;
-}
+  height: 40px;
+} */
 
 .App > .control > .play-switch > i{
-  color: darksalmon;
-  padding: 0;
+  /* color: darksalmon; */
+  /* padding: 0;
   height: auto;
-  width: auto;
+  width: auto; */
   border-radius: 50%;
-  font-size: 40px;
+  /* font-size: 40px; */
 }
 
 img::selection {
