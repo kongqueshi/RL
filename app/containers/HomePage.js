@@ -1,3 +1,4 @@
+/* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -48,7 +49,6 @@ export default class HomePage extends Component {
     
     this.playMode = config.playMode || 'random'
     this.playSpeed = config.playSpeed || 1500
-    this.pause = config.pause || false
     this.onTop = config.onTop || false
     this.opacity = config.opacity || 1
     this.state.pause = config.pause || false
@@ -66,7 +66,7 @@ export default class HomePage extends Component {
       config = {
         playMode: this.playMode,
         playSpeed: this.playSpeed,
-        pause: this.pause,
+        pause: this.state.pause,
         onTop: this.onTop,
         opacity: this.opacity
       }
@@ -113,7 +113,7 @@ export default class HomePage extends Component {
           { label: '减速播放', click: () => this.changePlaySpeed(200), accelerator: 'Down'},
           { label: '下一个', click: () => this.nextImage(true), accelerator: 'Right'},
           { label: '上一个', click: () => this.preImage(true), accelerator: 'Left'},
-          { label: '暂停/开始 播放', click: () => { this.pause = !this.pause }, accelerator: 'Space' },
+          { label: '暂停/开始 播放', click: () => { this.setState({pause: !this.state.pause}) }, accelerator: 'Space' },
           { label: '删除', click: () => this.delete(), accelerator: 'Delete' },
           { label: '全屏', click: () => this.browserWindow.setFullScreen(true), accelerator: 'Enter' },
           { label: '退出全屏', click: () => this.browserWindow.setFullScreen(false), accelerator: 'Esc' },
@@ -157,7 +157,7 @@ export default class HomePage extends Component {
     if (!force && this.state.tagPanelVisible) return
 
     const { length } = this.files
-    if (this.files && length && (!this.pause || force)) {
+    if (this.files && length && (!this.state.pause || force)) {
       let nextIndex
 
       if (this.history.length > 0 && this.historyIndex < this.history.length) {
@@ -303,7 +303,7 @@ export default class HomePage extends Component {
                 <Icon type="double-left"/>
               </div>
               
-              <div className='play-switch' onClick={() => {this.pause = !this.pause; this.setState({pause: this.pause});this.resetControlTimer()}}>
+              <div className='play-switch' onClick={() => {this.setState({pause: !pause});this.resetControlTimer()}}>
                 <Icon type={pause ? 'play-circle' : "pause-circle"} />
               </div>
 
