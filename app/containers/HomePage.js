@@ -15,13 +15,14 @@ import filetypies from '../constants/filetypies'
 import Tag from '../components/tag/tag'
 import './HomePage.css'
 import getHomePath from '../utils/home'
+import ImageFlow from '../components/imageflow/imageFlow';
 
 const localElectron = require('electron')
 
 const electron = localElectron.remote.require('electron')
 const { Menu, BrowserWindow } = electron
 
-const BASE_PATH = 'f:/huaban/'
+const BASE_PATH = '/Users/kongqueshi/Downloads/'
 
 export default class HomePage extends Component {
   constructor() {
@@ -98,8 +99,9 @@ export default class HomePage extends Component {
       if(err) {
         console.error(err)
       } else {
-        this.files = files
-        this.timer = setInterval(this.nextImage, this.playSpeed)
+        this.files = files.map(file => { return {'url': 'file://' + BASE_PATH + file}})
+        this.setState({files: this.files})
+        // this.timer = setInterval(this.nextImage, this.playSpeed)
       }
     })
 
@@ -291,7 +293,7 @@ export default class HomePage extends Component {
   }
 
   render() {
-    const { path, pause, showControl, crawerModalVisible, crawerType, tagIds, tagPanelWidth, tagPanelOpacity, imageWidth, imageHeight } = this.state
+    const { path, pause, showControl, crawerModalVisible, crawerType, tagIds, tagPanelWidth, tagPanelOpacity, imageWidth, imageHeight, files } = this.state
 
     const imageUrl = `file://${BASE_PATH}${path}`
 
@@ -313,12 +315,14 @@ export default class HomePage extends Component {
           </div>
         }
 
-        {path && <img ref={(image) => {this.image = image}} 
+        {/* {path && <img ref={(image) => {this.image = image}} 
                     style={{width: imageWidth, height: imageHeight}} 
                     alt="" src={imageUrl}
                     onDoubleClick={() => this.nextImage(true)}
                   />
-        }
+        } */}
+
+        {files && files.length && <ImageFlow images={files}/>}
 
         <Tag 
           style={{width: tagPanelWidth, opacity: tagPanelOpacity}}
