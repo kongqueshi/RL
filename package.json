@@ -251,6 +251,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.5.0",
     "antd": "^3.16.5",
+    "antd-table-infinity": "^1.1.2",
     "crypto": "^1.0.1",
     "css-loader": "^2.1.1",
     "devtron": "^1.4.0",
@@ -264,6 +265,8 @@
     "react-redux": "^5.1.1",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
+    "react-stack-grid": "^0.7.1",
+    "react-virtualized": "^9.21.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "source-map-support": "^0.5.9",

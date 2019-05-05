@@ -1,11 +1,13 @@
-.image-flow div {
-    margin: 10px 20px;
+.image-flow {
+    height: 100%;
+}
+
+.image-div {
     height: auto;
-    width: 200px;
     display: inline-block;
 }
 
-.image-flow div img {
+.image-div img {
     width: 100%;
-    height: auto;
+    /* height: auto; */
 }

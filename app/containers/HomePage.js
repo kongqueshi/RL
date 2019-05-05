@@ -23,7 +23,7 @@ const localElectron = require('electron')
 const electron = localElectron.remote.require('electron')
 const { Menu, BrowserWindow } = electron
 
-const BASE_PATH = '/Users/kongqueshi/Downloads/'
+const BASE_PATH = 'f:/huaban/'
 
 export default class HomePage extends Component {
   constructor() {
@@ -99,7 +99,7 @@ export default class HomePage extends Component {
       if(err) {
         console.error(err)
       } else {
-        this.files = files.map(file => { return {'url': 'file://' + BASE_PATH + file}})
+        this.files = files.map(file => { return {'url': `file://${BASE_PATH}${file}`} })
         this.setState({files: this.files})
         // this.timer = setInterval(this.nextImage, this.playSpeed)
       }
@@ -324,13 +324,13 @@ export default class HomePage extends Component {
 
         {files && files.length && <ImageFlow images={files}/>}
 
-        <Tag 
+        {/* <Tag 
           style={{width: tagPanelWidth, opacity: tagPanelOpacity}}
           selectedTagIds={tagIds}
           onChange={(selectedTags) => this.onTagChange(selectedTags)} 
           onMouseOver={() => this.setTagPanelVisible(true)} 
           onMouseOut={() => this.setTagPanelVisible(false)}
-        />
+        /> */}
 
         {crawerModalVisible && <Crawer type={crawerType} pathToSave={BASE_PATH} close={() => this.setState({crawerModalVisible: false})} 
           onFinish={(sucessCount, failCount) => this.showNotification('爬取完成', `成功 ${sucessCount}，失败 ${failCount}`)}/>}
