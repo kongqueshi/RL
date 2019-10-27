@@ -1,8 +1,11 @@
 .image-flow {
-    height: 100%;
+    overflow: auto;
 }
 
+
 .image-div {
+    width: 400px;
+    margin: 20px;
     height: auto;
     display: inline-block;
 }

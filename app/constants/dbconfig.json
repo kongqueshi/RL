@@ -1,11 +1,25 @@
 {
   "NAME": "db.db",
-  "CURRENT_VERSION": 2,
+  "CURRENT_VERSION": 3,
   "DB_UPDATE_SQLS": [
-    {"ID": 1, "SQL": "CREATE TABLE IF NOT EXISTS images(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, path TEXT, hash TEXT UNIQUE, tagIds TEXT, isDelete INTEGER DEFAULT 0)"},
-    {"ID": 1, "SQL": "CREATE TABLE IF NOT EXISTS tags(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"},
-    {"ID": 1, "SQL": "CREATE UNIQUE INDEX idx_images_hash ON images (hash)"},
-    {"ID": 2, "SQL": "CREATE TABLE IF NOT EXISTS version(version INTEGER DEFAULT 1)"},
-    {"ID": 2, "SQL": "INSERT INTO version('version') VALUES(1)"},
-    {"ID": 2, "SQL": "ALTER TABLE tags ADD COLUMN count INTEGER DEFAULT 0"}]
+    {
+      "ID": 1,
+      "SQL": "CREATE TABLE IF NOT EXISTS images(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, path TEXT, hash TEXT UNIQUE, tagIds TEXT, isDelete INTEGER DEFAULT 0)"
+    },
+    {
+      "ID": 1,
+      "SQL": "CREATE TABLE IF NOT EXISTS tags(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
+    },
+    { "ID": 1, "SQL": "CREATE UNIQUE INDEX idx_images_hash ON images (hash)" },
+    {
+      "ID": 2,
+      "SQL": "CREATE TABLE IF NOT EXISTS version(version INTEGER DEFAULT 1)"
+    },
+    { "ID": 2, "SQL": "INSERT INTO version('version') VALUES(1)" },
+    { "ID": 2, "SQL": "ALTER TABLE tags ADD COLUMN count INTEGER DEFAULT 0" },
+    {
+      "ID": 3,
+      "SQL": "CREATE TABLE IF NOT EXISTS tag_images(tag_id INTEGER PRIMARY KEY, image_ids TEXT)"
+    }
+  ]
 }

@@ -1,10 +1,13 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-unused-expressions */
 // @flow
 import * as React from 'react'
+import fs from 'fs'
 import dbconfig from '../constants/dbconfig'
 import Sqlite3 from '../utils/sqlite3'
 import HomePage from './HomePage'
 import getHomePath from '../utils/home'
-import fs from 'fs'
 
 export default class App extends React.Component {
   constructor(props) {

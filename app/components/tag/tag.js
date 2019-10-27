@@ -135,7 +135,7 @@ export default class Tag extends Component {
 
   handleSelectTag = (tagId) => {
     const { allTags } = this.state
-    this.onTagChange(allTags[tagId])
+    this.onTagChange(allTags[tagId], false)
   }
 
   handleUnSelectTag = (tagId) => {
@@ -181,7 +181,7 @@ export default class Tag extends Component {
 
     const { onChange } = this.props
 
-    onChange && onChange(selectedTags)
+    onChange && onChange(selectedTags, flag, tag)
   }
 
   renderTags = (tags, isSelected) => {

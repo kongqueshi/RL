@@ -1,7 +1,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react'
-import StackGrid from "react-stack-grid"
+import InfiniteScroll from 'react-infinite-scroller'
 import './imageFlow.css'
 
 export default class ImageFlow extends Component {
@@ -17,21 +17,13 @@ export default class ImageFlow extends Component {
         this.loading = false
     }
 
-    
     componentDidMount() {
         this.loadImages(50)
     }
 
-    onScroll = (e) => {
-        const { imageFlow } = this
-        if ( imageFlow.scrollHeight - (imageFlow.scrollTop + imageFlow.clientHeight) <= 50 ) {
-            this.loadImages(5)
-        }
-    }
-
     loadImages = (addCount) => {
         const { imageDivs } = this.state
-        const { images } = this.props
+        const { images, onImageClick } = this.props
         let { index, loading } = this
 
         if(images && images.length && !loading) {
@@ -42,7 +34,7 @@ export default class ImageFlow extends Component {
                 break
 
                 const image = images[index]
-                imageDivs.push(<div className='image-div' key={index}><img alt="" src={image.url}/></div>)
+                imageDivs.push(<div className='image-div' key={index} onClick={() => onImageClick(image)}><img alt="" src={image.url}/></div>)
                 count++
             }
 
@@ -58,24 +50,18 @@ export default class ImageFlow extends Component {
         const { imageDivs } = this.state
        
         return (
-            <div onScroll={(e) => this.onScroll(e)} ref={imageFlow => this.imageFlow = imageFlow}>
-            <div className='image-flow'  >
-                <button style={{position: 'absolute'}} onClick={() => this.loadImages(5)}>sdsdd</button>
-                
-                <StackGrid
-                    columnWidth={300}
-                    monitorImagesLoaded={false}
-                    duration={400}
-                    gridRef={grid => this.grid = grid}
+            <div className='image-flow'>
+                <InfiniteScroll
+                    pageStart={0}
+                    loadMore={() => this.loadImages(5)}
+                    hasMore={true}
+                    useWindow={false}
                 >
-                    {imageDivs}
-                </StackGrid>
+                    <div className="tracks">
+                        {imageDivs}
+                    </div>
+                </InfiniteScroll>
             </div>
-            </div>
-            
-            // <div className='image-flow' ref={imageFlow => { this.imageFlow = imageFlow }} onScroll={(e) => this.onScroll(e)}>
-            //     {imageDivs}
-            // </div>
         )
     }
 }
